@@ -1,25 +1,25 @@
 <?php
-	namespace bundle\yandextranslate;
-	
-	/**
-	 * Абстрактный класс помошник
-	 */
-	abstract class Y_API {
+    namespace bundle\yandextranslate;
+    
+    /**
+     * Абстрактный класс помошник
+     */
+    abstract class Y_API {
         /**
          * response code
          * @var int success
          */
-		const SUCCESS = 200;
+        const SUCCESS = 200;
 
         /**
          * @var string
          */
-		protected $token = null;
+        protected $apiKey = null;
 
         /**
          * @var HttpClient
          */
-		protected $http = null;
+        protected $http = null;
 
 
 
@@ -32,33 +32,25 @@
          */
         final protected function urlReplacer ($replace) {
 
-			$keys = array_map('strtoupper', array_keys($replace));
-			return str_replace($keys, $replace, static::BASE_URL);
+            $keys = array_map('strtoupper', array_keys($replace));
+            return str_replace($keys, $replace, static::BASE_URL);
 
-		}
+        }
 
         /**
          * Отправка POST запроса
          * @param $url
          * @param $translateString
-         * @return string
-         * @throws \bundle\yandextranslate\YandexTranslateException
+         * @return array
          */
-        final protected function httpPost ($url, $translateString) {
+        final protected function httpPost ($url, $postData = []) {
 
-			$httpResponse = $this->http->post($url, ["text" => trim($translateString)]);
+            $httpResponse = $this->http->post($url, $postData);
+            return json_decode($httpResponse->body(), true);
 
-			$json = json_decode($httpResponse->body(), true);
-
-			if(is_array($json) && $json['code'] == self::SUCCESS) {
-				return $json['text'][0];
-			}
-
-            Throw new YandexTranslateException( $json['code'] );
-
-		}
+        }
 
 
 
 
-	}
+    }

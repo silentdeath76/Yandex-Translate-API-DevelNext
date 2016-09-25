@@ -6,4 +6,4 @@ icon=develnext/bundle/yandextranslate/icon32.png
 
 class=develnext\\bundle\\yandextranslate\\YandexTranslateBundle
 author=Silent
-version=0.2
+version=0.3
