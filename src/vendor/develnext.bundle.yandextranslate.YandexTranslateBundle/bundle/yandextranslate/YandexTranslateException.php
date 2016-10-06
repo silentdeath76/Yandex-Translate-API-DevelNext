@@ -24,7 +24,7 @@
 
 
 
-        final public function __construct($errorCode = Y_API::SUCCESS) {
+        final public function __construct($errorCode = YandexTranslate::SUCCESS) {
 
             if(array_key_exists($errorCode, $this->_message)) {
                 parent::__construct($this->_message[$errorCode], $errorCode);

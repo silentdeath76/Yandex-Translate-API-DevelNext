@@ -5,12 +5,25 @@
         bundle\http\HttpResponse,
         bundle\http\HttpClient;
 
+    // TODO: Был удален класс Y_API как временное решение при невозможности провести финальную компиляцию
+
     /**
      * Class YandexTranslate
      */
-    class YandexTranslate extends Y_API {
-        const HOST = "https://translate.yandex.net/api/v1.5/tr.json/";
-        const BASE_URL = 'translate?key={API_KEY}&lang={LANG}&format=plain';
+    class YandexTranslate  {
+        const
+            HOST = "https://translate.yandex.net/api/v1.5/tr.json/",
+            SUCCESS = 200;
+
+        /**
+         * @var string
+         */
+        protected $apiKey = null;
+
+        /**
+         * @var HttpClient
+         */
+        protected $http = null;
 
 
         /**
@@ -48,12 +61,10 @@
          * @throws YandexTranslateException
          */
         public function translate ($translateString, $lang = "en-ru") {
-            $url = self::HOST . $this->urlReplacer([
-                        '{API_KEY}' => $this->apiKey,
-                        '{LANG}' => $lang
-                    ]);
 
-            $response = $this->httpPost($url, ["text" => trim($translateString)]);
+            $url = sprintf('translate?key=%s&lang=%s&format=plain', $this->apiKey, $lang);
+
+            $response = $this->httpPost($url, ["text" => $translateString]);
 
             if(is_array($response) && $response['code'] == self::SUCCESS) {
                 return $response['text'][0];
@@ -62,15 +73,15 @@
             Throw new YandexTranslateException( $response['code'] );
         }
 
-
         /**
          * Возвращает список поддерживаемых языков
+         * Return a list supported langs
          * @param string $ui
          * @return array
          * @throws YandexTranslateException
          */
         public function getLangs ($ui = "ru") {
-            $url = self::HOST . 'getLangs?key=' . $this->apiKey . '&ui=' . $ui;
+            $url = sprintf('getLangs?key=%s&ui=%s', $this->apiKey, $ui);
             $response = $this->httpPost($url);
 
             if(is_array($response) && isset($response['langs'])) {
@@ -78,5 +89,22 @@
             }
 
             Throw new YandexTranslateException( $response['code'] );
+        }
+
+
+
+
+
+        /**
+         * Отправка POST запроса
+         * @param $url
+         * @param $translateString
+         * @return array
+         */
+        final private function httpPost ($url, $postData = []) {
+
+            $httpResponse = $this->http->post(self::HOST . $url, $postData);
+            return json_decode($httpResponse->body(), true);
+
         }
     }
